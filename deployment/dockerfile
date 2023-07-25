@@ -1,0 +1,32 @@
+FROM python:3.9
+
+# Set the working directory
+WORKDIR /app
+
+# Copy the necessary files to the working directory
+COPY backend/main.py /app/backend/main.py
+COPY frontend/index.html /app/frontend/index.html
+COPY frontend/style.css /app/frontend/style.css
+COPY frontend/script.js /app/frontend/script.js
+COPY database/db.py /app/database/db.py
+COPY nlp/nlp_model.py /app/nlp/nlp_model.py
+COPY chatbot_integration/dialogflow_api.py /app/chatbot_integration/dialogflow_api.py
+COPY chatbot_integration/rasa_api.py /app/chatbot_integration/rasa_api.py
+COPY chatbot_integration/microsoft_bot_framework_api.py /app/chatbot_integration/microsoft_bot_framework_api.py
+COPY ui/user_interface.py /app/ui/user_interface.py
+COPY data_storage/user_preferences.db /app/data_storage/user_preferences.db
+COPY data_storage/user_preferences.sql /app/data_storage/user_preferences.sql
+COPY deployment/dockerfile /app/deployment/dockerfile
+COPY deployment/aws_infrastructure.yml /app/deployment/aws_infrastructure.yml
+COPY deployment/azure_infrastructure.yml /app/deployment/azure_infrastructure.yml
+COPY api/twilio_api.py /app/api/twilio_api.py
+COPY security/ssl_tls_configuration.py /app/security/ssl_tls_configuration.py
+COPY security/jwt_authentication.py /app/security/jwt_authentication.py
+COPY ci_cd/jenkins_pipeline.groovy /app/ci_cd/jenkins_pipeline.groovy
+COPY ci_cd/gitlab_ci_pipeline.yml /app/ci_cd/gitlab_ci_pipeline.yml
+
+# Install the necessary dependencies
+RUN pip install flask
+
+# Set the entry point command
+CMD ["python", "backend/main.py"]

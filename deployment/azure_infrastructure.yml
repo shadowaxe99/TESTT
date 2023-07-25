@@ -1,0 +1,121 @@
+deployment/azure_infrastructure.yml:
+
+```yaml
+# Azure Resource Group
+resourceGroup: my-resource-group
+
+# Azure App Service Plan
+appServicePlan:
+  name: my-app-service-plan
+  location: West US
+  sku:
+    tier: Standard
+    size: S1
+
+# Azure Web App
+webApp:
+  name: my-web-app
+  location: West US
+  kind: app
+  dependsOn:
+    - appServicePlan
+
+# Azure Database for PostgreSQL
+database:
+  name: my-database
+  location: West US
+  sku:
+    name: B_Gen5_1
+    tier: Basic
+  properties:
+    sslEnforcement: Enabled
+    version: 11
+
+# Azure Storage Account
+storageAccount:
+  name: my-storage-account
+  location: West US
+  sku:
+    name: Standard_LRS
+  kind: StorageV2
+
+# Azure Container Registry
+containerRegistry:
+  name: my-container-registry
+  location: West US
+  sku:
+    name: Basic
+  adminEnabled: true
+
+# Azure Virtual Network
+virtualNetwork:
+  name: my-virtual-network
+  location: West US
+  addressSpace:
+    - 10.0.0.0/16
+  subnets:
+    - name: my-subnet
+      addressPrefix: 10.0.0.0/24
+
+# Azure Load Balancer
+loadBalancer:
+  name: my-load-balancer
+  location: West US
+  frontendIPConfigurations:
+    - name: my-frontend-ip
+      publicIPAddress:
+        name: my-public-ip
+        sku:
+          name: Standard
+      subnet:
+        name: my-subnet
+  backendAddressPools:
+    - name: my-backend-pool
+  probes:
+    - name: my-probe
+      protocol: Http
+      port: 80
+      intervalInSeconds: 15
+      numberOfProbes: 4
+  loadBalancingRules:
+    - name: my-load-balancing-rule
+      frontendIPConfiguration:
+        name: my-frontend-ip
+      backendAddressPool:
+        name: my-backend-pool
+      probe:
+        name: my-probe
+      protocol: Tcp
+      frontendPort: 80
+      backendPort: 80
+
+# Azure Traffic Manager
+trafficManager:
+  name: my-traffic-manager
+  location: West US
+  profileStatus: Enabled
+  trafficRoutingMethod: Priority
+  dnsConfig:
+    relativeName: my-traffic-manager
+    ttl: 30
+  monitorConfig:
+    protocol: Http
+    port: 80
+    path: /
+    intervalInSeconds: 30
+    timeoutInSeconds: 10
+    toleratedNumberOfFailures: 3
+  endpoints:
+    - name: my-endpoint-1
+      type: AzureEndpoints
+      targetResourceId: my-web-app
+      priority: 1
+      endpointStatus: Enabled
+    - name: my-endpoint-2
+      type: AzureEndpoints
+      targetResourceId: my-web-app
+      priority: 2
+      endpointStatus: Disabled
+```
+
+This is a sample Azure Infrastructure YAML file that defines the infrastructure components required for deploying the Über Clone platform on the Azure cloud. It includes the resource group, app service plan, web app, database, storage account, container registry, virtual network, load balancer, and traffic manager configurations. Modify the values according to your specific requirements and Azure environment.

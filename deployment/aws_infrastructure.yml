@@ -1,0 +1,85 @@
+deployment/aws_infrastructure.yml:
+
+```yaml
+# AWS CloudFormation template for deploying the Über Clone platform
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AWS CloudFormation template for deploying the Über Clone platform
+
+Resources:
+  # Define the EC2 instance for hosting the backend
+  BackendInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-0c94855ba95c71c99
+      InstanceType: t2.micro
+      KeyName: my-key-pair
+      SecurityGroupIds:
+        - sg-0123456789abcdef0
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          echo "Starting backend server..."
+          cd /home/ubuntu/backend
+          npm install
+          npm start
+
+  # Define the S3 bucket for storing user data and media files
+  UserBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: my-uber-clone-user-bucket
+      AccessControl: Private
+
+  # Define the RDS database for storing user preferences and data
+  Database:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      Engine: postgres
+      EngineVersion: 12.7
+      DBInstanceIdentifier: my-uber-clone-database
+      MasterUsername: admin
+      MasterUserPassword: mysecretpassword
+      AllocatedStorage: 20
+      StorageType: gp2
+      DBInstanceClass: db.t2.micro
+      VPCSecurityGroups:
+        - sg-0123456789abcdef0
+
+  # Define the Elastic Load Balancer for distributing traffic to backend instances
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: my-uber-clone-load-balancer
+      Subnets:
+        - subnet-0123456789abcdef0
+        - subnet-0123456789abcdef1
+      SecurityGroups:
+        - sg-0123456789abcdef0
+      Type: application
+
+  # Define the Target Group for routing traffic to backend instances
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: my-uber-clone-target-group
+      Port: 80
+      Protocol: HTTP
+      VpcId: vpc-0123456789abcdef0
+      TargetType: instance
+      Targets:
+        - Id: !Ref BackendInstance
+
+  # Define the Listener for the Load Balancer to listen on port 80
+  Listener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref LoadBalancer
+      Protocol: HTTP
+      Port: 80
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref TargetGroup
+```
+
+This code is a YAML CloudFormation template for deploying the Über Clone platform on AWS. It defines AWS resources such as an EC2 instance for hosting the backend, an S3 bucket for storing user data and media files, an RDS database for storing user preferences and data, an Elastic Load Balancer for distributing traffic to backend instances, a Target Group for routing traffic to backend instances, and a Listener for the Load Balancer to listen on port 80. The template also specifies the necessary configurations for each resource, such as instance type, security groups, subnets, and access control.
